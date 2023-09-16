@@ -102,10 +102,10 @@ class CategoryListView(ListView):
             queryset = Post.objects.select_related('author')\
                 .select_related('location')\
                 .select_related('category').filter(
-                        is_published=True,
-                        category__is_published=True,
-                        pub_date__lte=dt.datetime.now(),
-                        category__slug=self.kwargs['category_slug'],
+                is_published=True,
+                category__is_published=True,
+                pub_date__lte=dt.datetime.now(),
+                category__slug=self.kwargs['category_slug'],
             ).annotate(comment_count=Count('comments')).order_by('-pub_date')
             return queryset
         else:

@@ -26,8 +26,8 @@ class PostListView(ListView):
             .select_related('location').select_related('category').filter(
             is_published=True,
             category__is_published=True,
-            pub_date__lte=dt.datetime.now(),
-            ).annotate(comment_count=Count('comments')).order_by('-pub_date')
+            pub_date__lte=dt.datetime.now(),)\
+            .annotate(comment_count=Count('comments')).order_by('-pub_date')
         return queryset
 
 
@@ -46,22 +46,21 @@ class ProfileListView(ListView):
                 is_published=True,
                 category__is_published=True,
                 location__is_published=True,
-                pub_date__lte=dt.datetime.now()
-                ).order_by('-pub_date')\
+                pub_date__lte=dt.datetime.now())\
+                .order_by('-pub_date')\
                 .annotate(comment_count=Count('comments'))
         else:
             return Post.objects.select_related('author')\
                 .select_related('location')\
                 .select_related('category').filter(
-                author__username=self.kwargs['author'],
-                ).order_by('-pub_date')\
+                author__username=self.kwargs['author'],)\
+                .order_by('-pub_date')\
                 .annotate(comment_count=Count('comments'))
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['profile'] = (
-            get_object_or_404(User, username=self.kwargs['author'])
-            )
+            get_object_or_404(User, username=self.kwargs['author']))
         return context
 
 
@@ -98,8 +97,7 @@ class CategoryListView(ListView):
 
     def get_queryset(self):
         category = get_object_or_404(
-            Category, slug=self.kwargs['category_slug']
-            )
+            Category, slug=self.kwargs['category_slug'])
         if category.is_published:
             queryset = Post.objects.select_related('author')\
                 .select_related('location')\
@@ -117,8 +115,7 @@ class CategoryListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['category'] = (
-            get_object_or_404(Category, slug=self.kwargs['category_slug'])
-            )
+            get_object_or_404(Category, slug=self.kwargs['category_slug']))
         return context
 
 

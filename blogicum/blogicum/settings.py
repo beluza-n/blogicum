@@ -155,3 +155,5 @@ INTERNAL_IPS = [
 ]
 
 MEDIA_ROOT = BASE_DIR / 'media'
+
+PAGINATE_BY = 10

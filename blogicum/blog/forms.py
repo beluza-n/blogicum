@@ -7,10 +7,10 @@ class PostForm(forms.ModelForm):
     class Meta:
         model = Post
         exclude = ('author',)
-        # Указываем, что надо отобразить все поля.
         fields = ('title', 'text', 'pub_date', 'location', 'category', 'image')
         widgets = {
-            'pub_date': forms.DateInput(attrs={'type': 'date'})
+            'pub_date': forms.DateInput(format='%Y-%m-%d',
+                                        attrs={'type': 'date'})
         }
 
 
@@ -19,11 +19,6 @@ class CommentForm(forms.ModelForm):
         model = Comment
         fields = ('text',)
 
-
-# class UserUpdateForm(UserCreationForm):
-#     class Meta:
-#         model = User
-#         fields = ('username', 'email', 'first_name', 'last_name')
 
 class UserUpdateForm(forms.ModelForm):
     class Meta:

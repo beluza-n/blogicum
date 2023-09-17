@@ -43,27 +43,27 @@ class Post(PublishedModel):
     text = models.TextField('Текст')
     pub_date = models.DateTimeField(
         'Дата и время публикации',
-        default=datetime.now,
+        default=datetime.now(),
         help_text='Если установить дату и время в будущем — можно '
         'делать отложенные публикации.',)
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         verbose_name='Автор публикации',
-        related_name='users',)
+        related_name='posts',)
     location = models.ForeignKey(
         Location,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         verbose_name='Местоположение',
-        related_name='locations',)
+        related_name='posts',)
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
         null=True,
         verbose_name='Категория',
-        related_name='categories',)
+        related_name='posts',)
     created_at = models.DateTimeField('Добавлено', auto_now_add=True)
     image = models.ImageField('Фото', upload_to='post_images', blank=True)
 
@@ -75,7 +75,6 @@ class Post(PublishedModel):
         return self.title
 
     def get_absolute_url(self):
-        # С помощью функции reverse() возвращаем URL объекта.
         return reverse('blog:profile', kwargs={'author': self.author})
 
 
@@ -91,7 +90,3 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ('created_at',)
-
-    # def get_absolute_url(self):
-    #     # С помощью функции reverse() возвращаем URL объекта.
-    #     return reverse('blog:post_detail', kwargs={'id': self.post.pk})

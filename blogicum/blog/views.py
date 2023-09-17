@@ -1,4 +1,3 @@
-from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
 from blog.models import Post, Category, Comment
 import datetime as dt
@@ -8,6 +7,7 @@ from django.views.generic import (
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse, reverse_lazy
+from django.conf import settings
 
 from .forms import PostForm, CommentForm, UserUpdateForm
 from django.core.exceptions import PermissionDenied
@@ -17,13 +17,13 @@ User = get_user_model()
 
 
 class PostListView(ListView):
-    paginate_by = 10
+    paginate_by = settings.PAGINATE_BY
     model = Post
     template_name = 'blog/index.html'
 
     def get_queryset(self):
-        queryset = Post.objects.select_related('author')\
-            .select_related('location').select_related('category').filter(
+        queryset = Post.objects.select_related(
+            'author', 'location', 'category').filter(
             is_published=True,
             category__is_published=True,
             pub_date__lte=dt.datetime.now(),)\
@@ -34,28 +34,23 @@ class PostListView(ListView):
 class ProfileListView(ListView):
     model = Post
     template_name = 'blog/profile.html'
-    paginate_by = 10
+    paginate_by = settings.PAGINATE_BY
     ordering = '-pub_date'
 
     def get_queryset(self):
+        queryset = Post.objects.select_related(
+            'author', 'location', 'category').filter(
+                author__username=self.kwargs['author'],)\
+                    .annotate(comment_count=Count('comments'))\
+                    .order_by('-pub_date')
         if self.kwargs['author'] != self.request.user.username:
-            return Post.objects.select_related('author')\
-                .select_related('location')\
-                .select_related('category').filter(
-                author__username=self.kwargs['author'],
+            return queryset.filter(
                 is_published=True,
                 category__is_published=True,
                 location__is_published=True,
-                pub_date__lte=dt.datetime.now())\
-                .order_by('-pub_date')\
-                .annotate(comment_count=Count('comments'))
+                pub_date__lte=dt.datetime.now()).order_by('-pub_date')
         else:
-            return Post.objects.select_related('author')\
-                .select_related('location')\
-                .select_related('category').filter(
-                author__username=self.kwargs['author'],)\
-                .order_by('-pub_date')\
-                .annotate(comment_count=Count('comments'))
+            return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -94,23 +89,16 @@ class PostDetailView(DetailView):
 class CategoryListView(ListView):
     model = Post
     template_name = 'blog/category.html'
+    paginate_by = settings.PAGINATE_BY
 
     def get_queryset(self):
         category = get_object_or_404(
-            Category, slug=self.kwargs['category_slug'])
-        if category.is_published:
-            queryset = Post.objects.select_related('author')\
-                .select_related('location')\
-                .select_related('category').filter(
-                is_published=True,
-                category__is_published=True,
-                pub_date__lte=dt.datetime.now(),
-                category__slug=self.kwargs['category_slug'],
-            ).annotate(comment_count=Count('comments')).order_by('-pub_date')
-            return queryset
-        else:
-            raise Http404
-    paginate_by = 10
+            Category,
+            slug=self.kwargs['category_slug'], is_published=True)
+        queryset = category.posts.select_related('author', 'location')\
+            .filter(is_published=True, pub_date__lte=dt.datetime.now(),)\
+            .annotate(comment_count=Count('comments')).order_by('-pub_date')
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

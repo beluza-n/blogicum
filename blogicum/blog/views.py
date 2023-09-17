@@ -40,9 +40,9 @@ class ProfileListView(ListView):
     def get_queryset(self):
         queryset = Post.objects.select_related(
             'author', 'location', 'category').filter(
-                author__username=self.kwargs['author'],)\
-                    .annotate(comment_count=Count('comments'))\
-                    .order_by('-pub_date')
+            author__username=self.kwargs['author'],)\
+            .annotate(comment_count=Count('comments'))\
+            .order_by('-pub_date')
         if self.kwargs['author'] != self.request.user.username:
             return queryset.filter(
                 is_published=True,

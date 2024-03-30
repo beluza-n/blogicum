@@ -7,3 +7,48 @@ Micro blog. Users can register, create posts, comment post of other users.
 * Django templates
 * Django ORM
 * Django forms
+
+### How to run the project:
+Clone repository and go to it with the terminal:
+
+```
+git clone https://github.com/beluza-n/blogicum.git
+```
+
+```
+cd blogicum
+```
+
+Create and activate virtual environment:
+
+```
+python3 -m venv env
+```
+
+```
+source env/bin/activate
+```
+
+Update pip (optional):
+
+```
+python3 -m pip install --upgrade pip
+```
+
+Install dependencies from the requirements.txt:
+
+```
+pip install -r requirements.txt
+```
+
+Run migrations:
+
+```
+python3 manage.py migrate
+```
+
+Launch the Django project:
+
+```
+python3 manage.py runserver
+```

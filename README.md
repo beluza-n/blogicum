@@ -22,11 +22,12 @@ cd blogicum
 Create and activate virtual environment:
 
 ```
-python3 -m venv env
+python3 -m venv venv
 ```
 
 ```
-source env/bin/activate
+source venv/bin/activate
+source venv/Scripts/activate (for Windows)
 ```
 
 Update pip (optional):
@@ -52,3 +53,4 @@ Launch the Django project:
 ```
 python3 manage.py runserver
 ```
+:point_right: Note: on Windows use "python" command instead of "python3".

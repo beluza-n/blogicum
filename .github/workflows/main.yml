@@ -8,7 +8,6 @@ on:
 jobs:
   tests:
     runs-on: ubuntu-latest
-    services:
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python
